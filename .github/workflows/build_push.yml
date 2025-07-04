@@ -27,22 +27,13 @@ jobs:
           java-version: 17
           distribution: temurin
 
-      - name: Prepare signing key
-        run: |
-          echo ${{ secrets.SIGNING_KEY }} | base64 -d > signingkey.jks
-
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build extensions
-        env:
-          CI_CHUNK_NUM: 0
-          ALIAS: ${{ secrets.ALIAS }}
-          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           chmod +x ./gradlew | true
-          ./gradlew -p src assembleRelease
+          ./gradlew -p src assembleDebug
 
       - name: Upload APKs
         uses: actions/upload-artifact@v4
@@ -50,9 +41,6 @@ jobs:
           name: "individual-apks"
           path: "**/*.apk"
           retention-days: 1
-
-      - name: Clean up CI files
-        run: rm signingkey.jks
 
   publish_repo:
     name: Publish repo
